@@ -33,15 +33,40 @@ def read_csv_file(filename: str) -> (list, list):
     lines = file.readlines()
     file.close()
     for line in lines:
-        rows.append(read_row(line))
+        rows.append(read_row(line, col_names))
     
     return (col_names, rows)
 
 def get_all_files(root: str) -> list:
-    onlyfiles = [f for f in listdir(root) if isfile(join(root, f))]
+    onlyfiles = [join(root, f) for f in listdir(root) if isfile(join(root, f))]
+    onlyfiles.sort()
     return onlyfiles
+
+"""
+Weather task specific
+"""
+
+# returns row (represented as dict) that is coldest in rows
+def get_min_for_table(rows: list, field: str) -> dict:
+    error = ["-9999", "N/A"]
+    lowest_row = None
+
+    for r in rows:
+        if r[field] in error:
+            continue
+        f = float(r[field])
+        print (r[field])
+        if lowest_row == None or f < float(lowest_row[field]):
+            lowest_row = r
+    
+    return lowest_row
     
 def main():
-    
-    read_csv_file("")
+    root = "nc_weather/2012"
+    files = get_all_files(root)
+
+    col_names, rows = read_csv_file(files[0])
+    print(get_min_for_table(rows, "TemperatureF"))
+    print(col_names)
+
 main()
