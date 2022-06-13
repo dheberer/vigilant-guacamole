@@ -41,12 +41,12 @@ def clean_album_artist(path: str) -> None:
     """
     files = files_in_dir(path)
     for f in files:
-        info = EasyID3(f)
-        if info.get('albumartist', None) is not None:
-            match_info = re.search("^\['(.*)'\]$", info['albumartist'])
-            if match_info is not None:
-                info['albumartist'] = match_info.group(1)
-                info.save()
+        match_info = re.search('^\[\'(.*)\'\]$', _get_unique_tag(f, 'albumartist'))
+        if match_info is not None:
+            info = EasyID3(f)
+            info['albumartist'] = match_info.group(1)
+            info.save()
+
 
 def set_empty_album_artists(path: str) -> None:
     """
@@ -98,5 +98,3 @@ def simple_deduplicate(path: str) -> None:
         f = os.path.join(path, f)
         print('Removing ' + f)
         os.remove(f)
-
-
