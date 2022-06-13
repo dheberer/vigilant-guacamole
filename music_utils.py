@@ -14,7 +14,9 @@ def _get_unique_tag(path: str, tag: str) -> str:
     value = info.get(tag, None)
     if value is None:
         value = ['Unknown']
-    return value[0]
+    while isinstance(value, list):
+        value = value[0]
+    return value
 
 
 def _get_unique_tags(path: str, tag: str) -> List[str]:
