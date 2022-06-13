@@ -10,6 +10,11 @@ def files_in_dir(path: str) -> List[str]:
 
 
 def _get_unique_tag(path: str, tag: str) -> str:
+    """
+    ID3 tags seem to be all returned as lists to us. We get the first item in the list
+    I'm sure it will bite me somehow. Also, especially with collaboration I see nested
+    lists in the artist tag. so we unroll those.
+    """
     info = EasyID3(path)
     value = info.get(tag, None)
     if value is None:
@@ -20,19 +25,12 @@ def _get_unique_tag(path: str, tag: str) -> str:
 
 
 def _get_unique_tags(path: str, tag: str) -> List[str]:
-    """
-    ID3 tags seem to be all returned as lists to us. We get the first item in the list
-    I'm sure it will bite me somehow.
-    """
     files = files_in_dir(path)
     tags = set()
 
     for f in files:
-        info = EasyID3(f)
-        data = info.get(tag, None)
-        if data is None:
-            data = ['Unknown']
-        tags.add(str(data[0]))
+        data = _get_unique_tag(f, tag)
+        tags.add(data)
     return list(tags)
 
 
