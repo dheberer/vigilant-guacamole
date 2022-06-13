@@ -23,11 +23,16 @@ if action not in ['list', 'move'] or kind not in ['artist', 'album']:
 if action == 'list':
     things = []
     if kind == 'artist':
+        print('Looking for empty album artists...')
         music_utils.set_empty_album_artists(source_dir)
+        print('Scrubbing away list artifacts...')
+        music_utils.clean_album_artist(source_dir)
+        print('Fetching the artists...')
         things = music_utils.get_album_artists(source_dir)
     if kind == 'album':
         things = music_utils.get_albums(source_dir)
     for thing in things:
+        print("-"*30)
         print(thing)
 
 if action == 'move':

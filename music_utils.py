@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import glob
 import os
+import re
 from mutagen.easyid3 import EasyID3
 from typing import List
 
@@ -33,6 +34,19 @@ def _get_unique_tags(path: str, tag: str) -> List[str]:
         tags.add(data)
     return list(tags)
 
+
+def clean_album_artist(path: str) -> None:
+    """
+    gets rid of leading and trailing ['(.*)']
+    """
+    files = files_in_dir(path)
+    for f in files:
+        info = EasyID3(f)
+        if info.get('albumartist', None) is not None:
+            match_info = re.search("^\['(.*)'\]$", info['albumartist'])
+            if match_info is not None:
+                info['albumartist'] = match_info.group(1)
+                info.save()
 
 def set_empty_album_artists(path: str) -> None:
     """
