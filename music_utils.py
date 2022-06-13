@@ -9,6 +9,14 @@ def files_in_dir(path: str) -> List[str]:
     return glob.glob(path + '/**/*.mp3', recursive=True)
 
 
+def _get_unique_tag(path: str, tag: str) -> str:
+    info = EasyID3(path)
+    value = info.get(tag, None)
+    if value is None:
+        value = ['Unknown']
+    return value[0]
+
+
 def _get_unique_tags(path: str, tag: str) -> List[str]:
     """
     ID3 tags seem to be all returned as lists to us. We get the first item in the list
@@ -20,7 +28,7 @@ def _get_unique_tags(path: str, tag: str) -> List[str]:
     for f in files:
         info = EasyID3(f)
         data = info.get(tag, None)
-        if data == '' or data is None:
+        if data is None:
             data = ['Unknown']
         tags.add(str(data[0]))
     return list(tags)
@@ -41,6 +49,14 @@ def set_empty_album_artists(path: str) -> None:
 
 def get_album_artists(path: str) -> List[str]:
     return _get_unique_tags(path, 'albumartist')
+
+
+def get_file_album_artist(path: str) -> str:
+    return _get_unique_tag(path, 'albumartist')
+
+
+def get_file_album_name(path: str) -> str:
+    return _get_unique_tag(path, 'album')
 
 
 def get_albums(path: str) -> List[str]:
@@ -69,11 +85,4 @@ def simple_deduplicate(path: str) -> None:
         print('Removing ' + f)
         os.remove(f)
 
-
-def create_artist_dirs(scan_path: str, write_path: str) -> None:
-    """
-  This will look for all mp3 files in the scan_path recursively
-  and build a list of unique names. Then it will write each of
-  the found artists in the dest_path
-  """
 

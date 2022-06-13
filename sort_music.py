@@ -2,7 +2,7 @@
 
 import sys
 import os
-
+from pathlib import Path
 import music_utils
 
 print("Music Sort......")
@@ -13,18 +13,32 @@ if len(sys.argv) != 4:
     exit()
 
 action = sys.argv[1]
-target = sys.argv[2]
-target_dir = sys.argv[3]
-if action not in ['list', 'move'] or target not in ['artist', 'album']:
+kind = sys.argv[2]
+source_dir = sys.argv[3]
+destination_dir = os.path.join(source_dir, "sorted")
+if action not in ['list', 'move'] or kind not in ['artist', 'album']:
     print("Invalid action or target, nothing done.")
     exit()
 
 if action == 'list':
     things = []
-    if target == 'artist':
-        music_utils.set_empty_album_artists(target_dir)
-        things = music_utils.get_album_artists(target_dir)
-    if target == 'album':
-        things = music_utils.get_albums(target_dir)
+    if kind == 'artist':
+        music_utils.set_empty_album_artists(source_dir)
+        things = music_utils.get_album_artists(source_dir)
+    if kind == 'album':
+        things = music_utils.get_albums(source_dir)
     for thing in things:
         print(thing)
+
+if action == 'move':
+    music_utils.set_empty_album_artists(source_dir)
+    files = music_utils.files_in_dir(source_dir)
+    for f in files:
+        artist = music_utils.get_file_album_artist(f)
+        album = music_utils.get_file_album_name(f)
+        destiny = os.path.join(destination_dir, artist)
+        if kind == 'album':
+            destiny = os.path.join(destiny, album)
+        Path(destiny).mkdir(parents=True, exist_ok=True)
+        f_prime = os.path.join(destiny, os.path.basename(f))
+        os.rename(src=f, dst=f_prime)
